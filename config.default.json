@@ -1,0 +1,62 @@
+{
+  "apps": {
+    "youtube": {
+      "enabled": true,
+      "name": "YouTube",
+      "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/256px-YouTube_full-color_icon_%282017%29.svg.png",
+      "launch_method": "browser",
+      "url": "https://www.youtube.com/tv"
+    },
+    "spotify": {
+      "enabled": true,
+      "name": "Spotify",
+      "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/256px-Spotify_logo_without_text.svg.png",
+      "launch_method": "browser",
+      "url": "https://open.spotify.com"
+    },
+    "jellyfin": {
+      "enabled": true,
+      "name": "Jellyfin",
+      "icon": "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/icon-transparent.svg",
+      "launch_method": "auto",
+      "url": "http://localhost:8096",
+      "prefer_native": true
+    }
+  },
+  "display": {
+    "performance_mode": "balanced",
+    "animation_quality": "medium",
+    "hide_cursor_timeout": 3000,
+    "resolution_hint": "1080p"
+  },
+  "startup": {
+    "autostart": false,
+    "boot_delay": 5,
+    "check_network": true,
+    "network_timeout": 30
+  },
+  "exit": {
+    "action": "cec_standby",
+    "cec_fallback": "close",
+    "show_confirmation": true
+  },
+  "remote": {
+    "enable_cec": true,
+    "cec_device": "auto",
+    "usb_remote": true
+  },
+  "advanced": {
+    "chromium_flags": [
+      "--kiosk",
+      "--no-first-run",
+      "--disable-infobars",
+      "--disable-session-crashed-bubble",
+      "--disable-component-update",
+      "--noerrdialogs",
+      "--enable-features=OverlayScrollbar",
+      "--force-dark-mode"
+    ],
+    "enable_logging": false,
+    "log_file": "/var/log/pi-media-hub.log"
+  }
+}
