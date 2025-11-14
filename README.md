@@ -19,6 +19,7 @@ A beautiful, full-screen media center interface for Raspberry Pi, designed to fe
 - **Configurable Apps** - Enable/disable apps and customize URLs
 - **Smart Launching** - Intelligent app detection (native vs browser)
 - **Network Aware** - Automatic offline detection and notification
+- **One-Command Install** - Get up and running in seconds
 
 ## Screenshots
 
@@ -185,11 +186,30 @@ The main configuration file. Key sections:
 - **Arrow Keys** - Navigate menu items
 - **Enter** - Select/Confirm
 - **Escape/Backspace** - Cancel/Go back
+- **S key** - Open settings menu
 - **~** (tilde) - Toggle offline mode (for testing)
 
 ### Mouse (if connected)
 - Hover over items to select
 - Click to launch
+- Click the cog icon (top right) to open settings
+
+### Settings UI
+
+Access the built-in settings interface by:
+- Pressing **S** on your keyboard/remote
+- Clicking the **cog icon** in the top right corner
+- Hovering over the settings button and pressing **Enter**
+
+The settings UI allows you to:
+- Enable/disable apps
+- Adjust performance mode
+- Configure cursor timeout
+- Toggle network checking
+- Set exit behavior
+- Enable/disable CEC control
+
+Changes can be saved and applied immediately, or you can reload the interface to apply all changes at once.
 
 ## HDMI-CEC Control
 
