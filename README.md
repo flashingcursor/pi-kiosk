@@ -9,7 +9,8 @@ A beautiful, full-screen media center interface for Raspberry Pi, designed to fe
 ## Features
 
 - **Elegant UI** - Smooth animations with glowing orb backgrounds
-- **Built-in Settings UI** - Professional TV-friendly configuration interface
+- **In-App Settings** - Professional TV-style settings interface (no SSH required!)
+- **One-Command Install** - Get started in minutes with a single command
 - **TV-Optimized** - Designed for HDMI displays with remote control support
 - **HDMI-CEC Support** - Control your TV power with the Pi
 - **USB Remote Compatible** - Navigate with any USB remote (arrow keys + enter)
@@ -54,23 +55,23 @@ The interface features:
 
 ## Quick Start
 
-### 1. Installation
+### 1. One-Command Installation (Recommended)
 
-#### One-Command Installation (Recommended)
-
-Install and set up Pi Media Hub with a single command:
+Install Pi Media Hub with a single command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/flashingcursor/pi-kiosk/main/quick-install.sh | bash
+curl -sSL https://raw.githubusercontent.com/flashingcursor/pi-kiosk/master/bootstrap.sh | bash
 ```
 
 This will:
-- Auto-detect and install dependencies (git, chromium, python3)
-- Clone the repository
-- Run the installer
-- Guide you through setup
+- Download the latest version
+- Install all required dependencies
+- Configure system settings (disable screen blanking, etc.)
+- Set up HDMI-CEC
+- Create systemd service
+- Optionally enable auto-start on boot
 
-#### Manual Installation
+### Alternative: Manual Installation
 
 Clone the repository and run the installer:
 
@@ -81,28 +82,25 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The installer will:
-- Install all required dependencies
-- Configure system settings (disable screen blanking, etc.)
-- Set up HDMI-CEC
-- Create systemd service
-- Run the setup wizard
-
 ### 2. Configuration
 
-Run the interactive setup wizard:
+**Option A: In-App Settings (Recommended)**
+
+Launch the media hub and click the **⚙️ Settings** button (top-right corner) to configure everything from your TV:
+- Enable/disable apps
+- Set Jellyfin server URL
+- Adjust performance mode
+- Configure CEC behavior
+- Set exit action
+- And more!
+
+**Option B: Command-Line Setup**
+
+Run the interactive setup wizard via SSH:
 
 ```bash
 python3 setup.py
 ```
-
-Configure:
-- Which apps to enable
-- Jellyfin server URL
-- Performance mode (low/balanced/high)
-- CEC settings
-- Exit behavior
-- Auto-start preferences
 
 ### 3. Testing
 

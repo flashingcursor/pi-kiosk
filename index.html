@@ -21,6 +21,7 @@
     body.show-cursor { cursor: default; }
     canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:-2; }
     canvas.low-perf { display: none; }
+
     .container {
       display:flex;
       flex-direction:column;
@@ -60,13 +61,13 @@
       position:absolute;
       top:40px;
       right:40px;
+      width:64px;
+      height:64px;
       display:flex;
       align-items:center;
       justify-content:center;
-      width:68px;
-      height:68px;
-      background:rgba(0, 170, 255, 0.2);
-      border:2px solid #00aaff;
+      background:rgba(100, 100, 255, 0.15);
+      border:2px solid rgba(100, 100, 255, 0.5);
       border-radius:50%;
       cursor:pointer;
       transition:all 0.3s ease;
@@ -75,12 +76,18 @@
     }
     #settingsBtn:hover, #settingsBtn:focus {
       opacity:1;
-      background:rgba(0, 170, 255, 0.4);
+      background:rgba(100, 100, 255, 0.3);
       transform:scale(1.1) rotate(90deg);
       outline:none;
     }
+    #settingsBtn.selected {
+      opacity:1;
+      background:rgba(100, 100, 255, 0.3);
+    }
     #settingsBtn svg {
-      width:36px; height:36px; fill:#00aaff;
+      width:36px;
+      height:36px;
+      fill:#6666ff;
       transition:transform 0.3s ease;
     }
 
@@ -109,8 +116,228 @@
       transform:scale(1.05);
       outline:none;
     }
+    #exitBtn.selected {
+      opacity:1;
+      background:rgba(255, 50, 50, 0.4);
+    }
     #exitBtn svg {
       width:32px; height:32px; fill:#ff4444;
+    }
+
+    /* Settings Screen */
+    #settingsScreen {
+      position:absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.95);
+      z-index:20;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 0.4s ease;
+      overflow-y:auto;
+      padding:60px 80px;
+    }
+    #settingsScreen.active {
+      opacity:1;
+      pointer-events:all;
+    }
+    .settings-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:40px;
+    }
+    .settings-title {
+      font-size:3.5rem;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:20px;
+    }
+    .settings-title svg {
+      width:48px; height:48px;
+      fill:#6666ff;
+    }
+    .settings-close {
+      font-size:2rem;
+      padding:12px 32px;
+      background:rgba(255,255,255,0.1);
+      border:2px solid rgba(255,255,255,0.3);
+      border-radius:12px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+    }
+    .settings-close:hover, .settings-close:focus {
+      background:rgba(255,255,255,0.2);
+      transform:scale(1.05);
+      outline:none;
+    }
+
+    /* Settings Grid */
+    .settings-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(420px, 1fr));
+      gap:30px;
+      margin-bottom:40px;
+    }
+    .setting-card {
+      background:rgba(255,255,255,0.05);
+      border:2px solid rgba(255,255,255,0.1);
+      border-radius:20px;
+      padding:32px;
+      transition:all 0.3s ease;
+    }
+    .setting-card:hover, .setting-card:focus-within {
+      background:rgba(255,255,255,0.08);
+      border-color:rgba(100,100,255,0.5);
+      transform:translateY(-4px);
+    }
+    .setting-label {
+      font-size:1.8rem;
+      font-weight:600;
+      margin-bottom:12px;
+      color:#aaf;
+    }
+    .setting-desc {
+      font-size:1.3rem;
+      opacity:0.7;
+      margin-bottom:20px;
+      line-height:1.5;
+    }
+    .setting-control {
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    /* Toggle Switch */
+    .toggle {
+      position:relative;
+      width:80px;
+      height:40px;
+      background:rgba(255,255,255,0.2);
+      border-radius:20px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      border:2px solid rgba(255,255,255,0.3);
+    }
+    .toggle.on {
+      background:#00ff88;
+      border-color:#00ff88;
+    }
+    .toggle-knob {
+      position:absolute;
+      top:4px;
+      left:4px;
+      width:28px;
+      height:28px;
+      background:#fff;
+      border-radius:50%;
+      transition:all 0.3s ease;
+      box-shadow:0 2px 8px rgba(0,0,0,0.3);
+    }
+    .toggle.on .toggle-knob {
+      left:44px;
+    }
+    .toggle:focus {
+      outline:none;
+      box-shadow:0 0 0 3px rgba(100,100,255,0.5);
+    }
+
+    /* Select Buttons */
+    .select-btn {
+      padding:12px 24px;
+      font-size:1.5rem;
+      background:rgba(255,255,255,0.1);
+      border:2px solid rgba(255,255,255,0.3);
+      border-radius:12px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      color:#fff;
+    }
+    .select-btn:hover, .select-btn:focus {
+      background:rgba(255,255,255,0.15);
+      transform:translateY(-2px);
+      outline:none;
+    }
+    .select-btn.active {
+      background:#6666ff;
+      border-color:#6666ff;
+      color:#fff;
+    }
+
+    /* Text Input */
+    .text-input {
+      width:100%;
+      padding:14px 20px;
+      font-size:1.6rem;
+      background:rgba(255,255,255,0.1);
+      border:2px solid rgba(255,255,255,0.3);
+      border-radius:12px;
+      color:#fff;
+      font-family:inherit;
+      transition:all 0.3s ease;
+    }
+    .text-input:focus {
+      outline:none;
+      background:rgba(255,255,255,0.15);
+      border-color:#6666ff;
+      box-shadow:0 0 0 3px rgba(100,100,255,0.3);
+    }
+    .text-input::placeholder {
+      color:rgba(255,255,255,0.5);
+    }
+
+    /* Save Bar */
+    .settings-save-bar {
+      position:sticky;
+      bottom:0;
+      left:0;
+      right:0;
+      background:rgba(0,0,0,0.9);
+      border-top:2px solid rgba(100,100,255,0.5);
+      padding:24px 80px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:-60px -80px 0;
+    }
+    .save-status {
+      font-size:1.6rem;
+      opacity:0.8;
+    }
+    .save-buttons {
+      display:flex;
+      gap:20px;
+    }
+    .save-btn {
+      padding:16px 48px;
+      font-size:1.8rem;
+      font-weight:600;
+      border-radius:12px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      border:2px solid;
+    }
+    .save-btn.primary {
+      background:#00ff88;
+      border-color:#00ff88;
+      color:#000;
+    }
+    .save-btn.secondary {
+      background:transparent;
+      border-color:rgba(255,255,255,0.5);
+      color:#fff;
+    }
+    .save-btn:hover, .save-btn:focus {
+      transform:scale(1.05);
+      outline:none;
+    }
+    .save-btn.primary:hover {
+      background:#00dd77;
+    }
+    .save-btn.secondary:hover {
+      background:rgba(255,255,255,0.1);
     }
 
     /* Confirmation Dialog */
@@ -123,7 +350,7 @@
       border-radius:24px;
       padding:40px 60px;
       text-align:center;
-      z-index:5;
+      z-index:25;
       opacity:0;
       pointer-events:none;
       transition:opacity 0.4s ease, transform 0.4s ease;
@@ -183,12 +410,12 @@
       width:100%; height:100%;
       background:#fff;
       opacity:0;
-      z-index:6;
+      z-index:30;
       pointer-events:none;
       transition: opacity 0.8s ease-out;
     }
 
-    /* Transparent logo overlay (5% opacity, colored) */
+    /* Transparent logo overlay */
     .overlay {
       position:absolute;
       top:50%; left:50%;
@@ -252,210 +479,28 @@
     }
     #loading.hidden { display: none; }
 
-    /* Settings Modal */
-    #settingsModal {
-      position:absolute;
-      top:0; left:0;
-      width:100%; height:100%;
-      background:rgba(0,0,0,0.95);
-      z-index:100;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 0.4s ease;
-      overflow-y:auto;
-      padding:40px;
-    }
-    #settingsModal.active {
-      opacity:1;
-      pointer-events:all;
-    }
-    #settingsContent {
-      max-width:1200px;
-      margin:0 auto;
-      background:rgba(15,15,25,0.98);
-      border:3px solid #00aaff;
-      border-radius:24px;
-      padding:50px 60px;
-      box-shadow:0 0 60px rgba(0,170,255,0.6);
-      backdrop-filter:blur(12px);
-    }
-    #settingsModal h1 {
-      font-size:3rem;
-      margin-bottom:40px;
-      color:#00aaff;
-      text-align:center;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:20px;
-    }
-    #settingsModal h1 svg {
-      width:48px; height:48px; fill:#00aaff;
-    }
-    .settings-section {
-      margin-bottom:40px;
-    }
-    .settings-section h2 {
-      font-size:2rem;
-      margin-bottom:24px;
-      color:#00ff88;
-      border-bottom:2px solid rgba(0,255,136,0.3);
-      padding-bottom:12px;
-    }
-    .setting-item {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:16px 20px;
-      margin-bottom:16px;
-      background:rgba(255,255,255,0.05);
-      border-radius:12px;
-      transition:all 0.3s ease;
-      gap:24px;
-    }
-    .setting-item:hover, .setting-item:focus-within {
-      background:rgba(0,170,255,0.15);
-      transform:translateX(8px);
-    }
-    .setting-label {
-      flex:1;
-      font-size:1.4rem;
-      color:rgba(255,255,255,0.9);
-    }
-    .setting-label small {
-      display:block;
-      font-size:1rem;
-      color:rgba(255,255,255,0.5);
-      margin-top:4px;
-    }
-    .setting-control {
-      min-width:200px;
-    }
-    .setting-control select,
-    .setting-control input[type="number"],
-    .setting-control input[type="text"] {
-      width:100%;
-      padding:12px 16px;
-      font-size:1.3rem;
-      background:rgba(0,0,0,0.5);
-      border:2px solid rgba(0,170,255,0.5);
-      border-radius:8px;
-      color:#fff;
-      cursor:pointer;
-      transition:all 0.3s ease;
-    }
-    .setting-control select:hover,
-    .setting-control select:focus,
-    .setting-control input:hover,
-    .setting-control input:focus {
-      border-color:#00aaff;
-      background:rgba(0,170,255,0.1);
-      outline:none;
-      transform:scale(1.05);
-    }
-    .setting-control input[type="checkbox"] {
-      width:60px;
-      height:32px;
-      position:relative;
-      appearance:none;
-      background:rgba(255,255,255,0.2);
-      border-radius:16px;
-      cursor:pointer;
-      transition:all 0.3s ease;
-      outline:none;
-    }
-    .setting-control input[type="checkbox"]:checked {
-      background:#00ff88;
-    }
-    .setting-control input[type="checkbox"]::before {
-      content:'';
-      position:absolute;
-      width:24px;
-      height:24px;
-      background:#fff;
-      border-radius:50%;
-      top:4px;
-      left:4px;
-      transition:all 0.3s ease;
-      box-shadow:0 2px 8px rgba(0,0,0,0.3);
-    }
-    .setting-control input[type="checkbox"]:checked::before {
-      left:32px;
-    }
-    .settings-actions {
-      display:flex;
-      justify-content:center;
-      gap:24px;
-      margin-top:40px;
-      padding-top:32px;
-      border-top:2px solid rgba(255,255,255,0.1);
-    }
-    .settings-btn {
-      padding:16px 48px;
-      font-size:1.6rem;
-      font-weight:600;
-      border-radius:12px;
-      cursor:pointer;
-      transition:all 0.3s ease;
-      border:none;
-    }
-    .settings-btn.primary {
-      background:#00ff88;
+    /* Toast Notification */
+    .toast {
+      position:fixed;
+      bottom:100px;
+      left:50%;
+      transform:translateX(-50%) translateY(200px);
+      background:rgba(0,255,136,0.95);
       color:#000;
-    }
-    .settings-btn.secondary {
-      background:transparent;
-      color:#00aaff;
-      border:2px solid #00aaff;
-    }
-    .settings-btn.danger {
-      background:transparent;
-      color:#ff6666;
-      border:2px solid #ff6666;
-    }
-    .settings-btn:hover, .settings-btn:focus {
-      transform:scale(1.1);
-      outline:none;
-    }
-    .settings-btn:hover.primary {
-      box-shadow:0 0 20px rgba(0,255,136,0.5);
-    }
-    .app-toggle-item {
-      display:flex;
-      align-items:center;
-      gap:20px;
-      padding:16px 20px;
-      margin-bottom:16px;
-      background:rgba(255,255,255,0.05);
+      padding:20px 40px;
       border-radius:12px;
-      transition:all 0.3s ease;
+      font-size:1.8rem;
+      font-weight:600;
+      z-index:100;
+      transition:all 0.4s ease;
+      box-shadow:0 8px 24px rgba(0,0,0,0.5);
     }
-    .app-toggle-item:hover {
-      background:rgba(0,170,255,0.15);
+    .toast.show {
+      transform:translateX(-50%) translateY(0);
     }
-    .app-toggle-item img {
-      width:48px;
-      height:48px;
-      object-fit:contain;
-      border-radius:8px;
-    }
-    .app-toggle-info {
-      flex:1;
-      font-size:1.4rem;
-    }
-    .restart-notice {
-      background:rgba(255,170,0,0.2);
-      border:2px solid #ffaa00;
-      border-radius:12px;
-      padding:16px 24px;
-      margin-top:24px;
-      text-align:center;
-      font-size:1.2rem;
-      color:#ffaa00;
-      display:none;
-    }
-    .restart-notice.visible {
-      display:block;
+    .toast.error {
+      background:rgba(255,68,68,0.95);
+      color:#fff;
     }
   </style>
 </head>
@@ -481,6 +526,38 @@
     </div>
   </div>
 
+  <!-- Settings Button -->
+  <div id="settingsBtn" tabindex="998">
+    <svg viewBox="0 0 24 24">
+      <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+    </svg>
+  </div>
+
+  <!-- Settings Screen -->
+  <div id="settingsScreen">
+    <div class="settings-header">
+      <div class="settings-title">
+        <svg viewBox="0 0 24 24">
+          <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+        </svg>
+        Settings
+      </div>
+      <button class="settings-close" id="settingsCloseBtn">Close</button>
+    </div>
+
+    <div class="settings-grid" id="settingsGrid">
+      <!-- Settings will be populated dynamically -->
+    </div>
+
+    <div class="settings-save-bar">
+      <div class="save-status" id="saveStatus">Modified settings will be saved</div>
+      <div class="save-buttons">
+        <button class="save-btn secondary" id="cancelBtn">Cancel</button>
+        <button class="save-btn primary" id="saveBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Overlays (populated dynamically) -->
   <div id="overlays"></div>
 
@@ -498,675 +575,5 @@
     Exit
   </div>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal">
-    <div id="settingsContent">
-      <h1>
-        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-        Settings
-      </h1>
-
-      <div id="settingsForm">
-        <!-- Apps Section -->
-        <div class="settings-section">
-          <h2>Applications</h2>
-          <div id="appsSettings"></div>
-        </div>
-
-        <!-- Display Section -->
-        <div class="settings-section">
-          <h2>Display</h2>
-          <div class="setting-item">
-            <div class="setting-label">
-              Performance Mode
-              <small>Adjust animation quality for your device</small>
-            </div>
-            <div class="setting-control">
-              <select id="performanceMode">
-                <option value="low">Low (Minimal animations)</option>
-                <option value="balanced">Balanced (Recommended)</option>
-                <option value="high">High (Maximum quality)</option>
-              </select>
-            </div>
-          </div>
-          <div class="setting-item">
-            <div class="setting-label">
-              Hide Cursor Timeout
-              <small>Seconds before cursor disappears (0 to disable)</small>
-            </div>
-            <div class="setting-control">
-              <input type="number" id="cursorTimeout" min="0" max="30" step="1" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Startup Section -->
-        <div class="settings-section">
-          <h2>Startup</h2>
-          <div class="setting-item">
-            <div class="setting-label">
-              Check Network on Startup
-              <small>Verify internet connection before launching</small>
-            </div>
-            <div class="setting-control">
-              <input type="checkbox" id="checkNetwork" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Exit Section -->
-        <div class="settings-section">
-          <h2>Exit Behavior</h2>
-          <div class="setting-item">
-            <div class="setting-label">
-              Exit Action
-              <small>What happens when you exit the launcher</small>
-            </div>
-            <div class="setting-control">
-              <select id="exitAction">
-                <option value="close">Close Application</option>
-                <option value="cec_standby">TV Standby (CEC)</option>
-                <option value="shutdown">Shutdown System</option>
-                <option value="reboot">Reboot System</option>
-              </select>
-            </div>
-          </div>
-          <div class="setting-item">
-            <div class="setting-label">
-              Show Exit Confirmation
-              <small>Ask before exiting the launcher</small>
-            </div>
-            <div class="setting-control">
-              <input type="checkbox" id="showExitConfirm" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Remote Section -->
-        <div class="settings-section">
-          <h2>Remote Control</h2>
-          <div class="setting-item">
-            <div class="setting-label">
-              Enable CEC Control
-              <small>Control with TV remote via HDMI-CEC</small>
-            </div>
-            <div class="setting-control">
-              <input type="checkbox" id="enableCEC" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="restart-notice" id="restartNotice">
-        Some changes require a restart to take effect
-      </div>
-
-      <div class="settings-actions">
-        <button class="settings-btn primary" id="saveSettings">Save Changes</button>
-        <button class="settings-btn secondary" id="reloadHub">Save & Reload</button>
-        <button class="settings-btn danger" id="closeSettings">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // === CONFIGURATION ===
-    let config = null;
-    let apps = [];
-
-    // === STATE ===
-    let isOnline = true;
-    let currentSelection = 0;
-    let inConfirm = false;
-    let pendingApp = null;
-    let cursorTimeout = null;
-
-    // === ELEMENTS ===
-    const appContainer = document.getElementById('appContainer');
-    const overlaysContainer = document.getElementById('overlays');
-    const exitBtn = document.getElementById('exitBtn');
-    const confirmDialog = document.getElementById('confirmDialog');
-    const dialogLogo = document.getElementById('dialogLogo');
-    const dialogDesc = document.getElementById('dialogDesc');
-    const confirmBtn = document.querySelector('#confirmDialog .confirm');
-    const cancelBtn = document.querySelector('#confirmDialog .cancel');
-    const whiteFlash = document.getElementById('whiteFlash');
-    const offlineScreen = document.getElementById('offlineScreen');
-    const loading = document.getElementById('loading');
-    const canvas = document.getElementById('orbCanvas');
-
-    // === LOAD CONFIG ===
-    async function loadConfig() {
-      try {
-        const response = await fetch('config.json');
-        if (!response.ok) {
-          const defaultResponse = await fetch('config.default.json');
-          config = await defaultResponse.json();
-        } else {
-          config = await response.json();
-        }
-        return config;
-      } catch (error) {
-        console.error('Failed to load config:', error);
-        // Fallback minimal config
-        config = {
-          apps: {},
-          display: { performance_mode: 'balanced', hide_cursor_timeout: 3000 },
-          startup: { check_network: true },
-          exit: { action: 'cec_standby', show_confirmation: true }
-        };
-        return config;
-      }
-    }
-
-    // === INITIALIZE UI ===
-    function initializeUI() {
-      // Build app list from config
-      apps = Object.entries(config.apps)
-        .filter(([key, app]) => app.enabled)
-        .map(([key, app]) => ({ key, ...app }));
-
-      // Populate apps
-      apps.forEach((app, index) => {
-        const item = document.createElement('div');
-        item.className = 'item';
-        item.tabIndex = index + 1;
-        item.dataset.app = app.key;
-        item.innerHTML = `
-          <img src="${app.icon}" alt="${app.name}">
-          ${app.name}
-        `;
-        appContainer.appendChild(item);
-
-        // Create overlay
-        const overlay = document.createElement('div');
-        overlay.className = `overlay ${app.key}`;
-        overlay.innerHTML = `<img src="${app.icon}" alt="${app.name}">`;
-        overlaysContainer.appendChild(overlay);
-      });
-
-      loading.classList.add('hidden');
-
-      // Setup cursor hiding
-      if (config.display.hide_cursor_timeout > 0) {
-        document.body.classList.add('show-cursor');
-        resetCursorTimeout();
-      }
-
-      // Initialize selection
-      updateSelection(0);
-      focusItem(0);
-    }
-
-    // === CURSOR MANAGEMENT ===
-    function resetCursorTimeout() {
-      document.body.classList.add('show-cursor');
-      if (cursorTimeout) clearTimeout(cursorTimeout);
-      if (config.display.hide_cursor_timeout > 0) {
-        cursorTimeout = setTimeout(() => {
-          document.body.classList.remove('show-cursor');
-        }, config.display.hide_cursor_timeout);
-      }
-    }
-
-    document.addEventListener('mousemove', resetCursorTimeout);
-    document.addEventListener('keydown', resetCursorTimeout);
-
-    // === NETWORK CHECK ===
-    async function checkNetwork() {
-      if (!config.startup.check_network) return true;
-
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3000);
-
-        const response = await fetch('https://www.google.com/favicon.ico?' + Date.now(), {
-          mode: 'no-cors',
-          signal: controller.signal
-        });
-
-        clearTimeout(timeout);
-        return true;
-      } catch {
-        return false;
-      }
-    }
-
-    async function updateNetworkStatus() {
-      const online = await checkNetwork();
-      if (online !== isOnline) {
-        isOnline = online;
-        offlineScreen.classList.toggle('active', !isOnline);
-      }
-    }
-
-    // === SELECTION MANAGEMENT ===
-    function updateSelection(index) {
-      const items = document.querySelectorAll('.item');
-      const overlays = document.querySelectorAll('.overlay');
-
-      items.forEach(i => i.classList.remove('selected'));
-      overlays.forEach(o => o.classList.remove('active'));
-      exitBtn.classList.remove('selected');
-      settingsBtn.classList.remove('selected');
-
-      if (index < items.length) {
-        items[index].classList.add('selected');
-        const app = apps[index];
-        const overlay = document.querySelector(`.overlay.${app.key}`);
-        if (overlay) overlay.classList.add('active');
-      } else if (index === items.length) {
-        exitBtn.classList.add('selected');
-      } else {
-        settingsBtn.classList.add('selected');
-      }
-    }
-
-    function focusItem(index) {
-      const items = document.querySelectorAll('.item');
-      if (index < items.length) {
-        items[index].focus();
-      } else if (index === items.length) {
-        exitBtn.focus();
-      } else {
-        settingsBtn.focus();
-      }
-    }
-
-    // === LAUNCH APP ===
-    function launchApp(appKey) {
-      const app = apps.find(a => a.key === appKey);
-      if (!app) return;
-
-      whiteFlash.style.opacity = '1';
-
-      setTimeout(() => {
-        // Call Python launcher via special protocol or window.location
-        window.location.href = `launch://app/${appKey}`;
-      }, 300);
-    }
-
-    // === CONFIRM DIALOG ===
-    function showConfirm(appKey) {
-      const app = apps.find(a => a.key === appKey);
-      if (!app) return;
-
-      inConfirm = true;
-      pendingApp = appKey;
-      dialogLogo.src = app.icon;
-      dialogDesc.textContent = 'This will open in full screen.';
-      confirmDialog.classList.add('active');
-      confirmBtn.focus();
-    }
-
-    function hideConfirm() {
-      inConfirm = false;
-      pendingApp = null;
-      confirmDialog.classList.remove('active');
-    }
-
-    function launchConfirmed() {
-      hideConfirm();
-      launchApp(pendingApp);
-    }
-
-    confirmBtn.onclick = launchConfirmed;
-    cancelBtn.onclick = hideConfirm;
-
-    // === EXIT HANDLING ===
-    function handleExit() {
-      if (config.exit.show_confirmation) {
-        if (confirm('Exit Pi Media Hub?')) {
-          performExit();
-        }
-      } else {
-        performExit();
-      }
-    }
-
-    function performExit() {
-      // Signal to Python backend
-      window.location.href = 'launch://exit';
-    }
-
-    exitBtn.onclick = handleExit;
-
-    // === NAVIGATION ===
-    document.addEventListener('keydown', (e) => {
-      if (!isOnline && !['~', 'Escape'].includes(e.key)) return;
-
-      // Debug: Toggle offline mode with ~
-      if (e.key === '~') {
-        isOnline = !isOnline;
-        offlineScreen.classList.toggle('active', !isOnline);
-        e.preventDefault();
-        return;
-      }
-
-      // Settings shortcut (S key or Menu key)
-      if (!inSettings && !inConfirm && (e.key === 's' || e.key === 'S' || e.key === 'ContextMenu')) {
-        openSettings();
-        e.preventDefault();
-        return;
-      }
-
-      if (inConfirm) {
-        if (e.key === 'Escape' || e.key === 'Backspace') {
-          hideConfirm();
-          e.preventDefault();
-          return;
-        }
-        if (e.key === 'Enter') {
-          if (document.activeElement === confirmBtn) {
-            launchConfirmed();
-          } else {
-            hideConfirm();
-          }
-          e.preventDefault();
-          return;
-        }
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'Tab') {
-          if (document.activeElement === confirmBtn) {
-            cancelBtn.focus();
-          } else {
-            confirmBtn.focus();
-          }
-          e.preventDefault();
-          return;
-        }
-        return;
-      }
-
-      if (inSettings) {
-        // Settings modal handles its own Escape key
-        return;
-      }
-
-      const totalItems = apps.length;
-      const isInExit = currentSelection === totalItems;
-      const isInSettings = currentSelection === totalItems + 1;
-
-      if (e.key === 'ArrowDown') {
-        if (isInSettings || isInExit) {
-          currentSelection = 0;
-        } else {
-          currentSelection = (currentSelection + 1) % totalItems;
-        }
-        updateSelection(currentSelection);
-        focusItem(currentSelection);
-        e.preventDefault();
-      } else if (e.key === 'ArrowUp') {
-        if (isInSettings) {
-          currentSelection = totalItems; // Go to exit
-        } else if (isInExit) {
-          currentSelection = totalItems - 1;
-        } else {
-          currentSelection = (currentSelection - 1 + totalItems) % totalItems;
-        }
-        updateSelection(currentSelection);
-        focusItem(currentSelection);
-        e.preventDefault();
-      } else if (e.key === 'ArrowRight') {
-        if (!isInExit && !isInSettings) {
-          currentSelection = totalItems;
-          updateSelection(currentSelection);
-          focusItem(currentSelection);
-        }
-        e.preventDefault();
-      } else if (e.key === 'ArrowLeft') {
-        if (isInExit) {
-          currentSelection = totalItems - 1;
-          updateSelection(currentSelection);
-          focusItem(currentSelection);
-        } else if (isInSettings) {
-          currentSelection = totalItems;
-          updateSelection(currentSelection);
-          focusItem(currentSelection);
-        }
-        e.preventDefault();
-      } else if (e.key === 'Enter') {
-        if (currentSelection < totalItems) {
-          const app = apps[currentSelection];
-          showConfirm(app.key);
-        } else if (isInSettings) {
-          openSettings();
-        } else {
-          handleExit();
-        }
-        e.preventDefault();
-      }
-    });
-
-    // Mouse hover
-    document.addEventListener('mouseover', (e) => {
-      if (inConfirm || inSettings) return;
-
-      const item = e.target.closest('.item');
-      if (item) {
-        const items = Array.from(document.querySelectorAll('.item'));
-        const index = items.indexOf(item);
-        if (index >= 0) {
-          currentSelection = index;
-          updateSelection(currentSelection);
-        }
-      } else if (e.target.closest('#exitBtn')) {
-        currentSelection = apps.length;
-        updateSelection(currentSelection);
-      } else if (e.target.closest('#settingsBtn')) {
-        currentSelection = apps.length + 1;
-        updateSelection(currentSelection);
-      }
-    });
-
-    // === ORB ANIMATION ===
-    function initOrbs() {
-      const ctx = canvas.getContext('2d', { alpha: true });
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      const perfMode = config.display.performance_mode || 'balanced';
-
-      // Adjust orb count based on performance mode
-      const orbCounts = { low: 3, balanced: 5, high: 8 };
-      const orbCount = orbCounts[perfMode] || 5;
-
-      const orbs = [];
-      const baseColors = [
-        'rgba(255, 0, 0, 0.04)',
-        'rgba(30, 215, 96, 0.04)',
-        'rgba(138, 43, 226, 0.04)'
-      ];
-
-      class Orb {
-        constructor() {
-          this.x = Math.random() * canvas.width;
-          this.y = Math.random() * canvas.height;
-          this.radius = 100 + Math.random() * 150;
-          this.speed = 0.2 + Math.random() * 0.4;
-          this.angle = Math.random() * Math.PI * 2;
-          this.color = baseColors[Math.floor(Math.random() * baseColors.length)];
-        }
-        update() {
-          this.angle += 0.003;
-          this.x += Math.cos(this.angle) * this.speed;
-          this.y += Math.sin(this.angle) * this.speed;
-
-          if (this.x > canvas.width + this.radius) this.x = -this.radius;
-          if (this.x < -this.radius) this.x = canvas.width + this.radius;
-          if (this.y > canvas.height + this.radius) this.y = -this.radius;
-          if (this.y < -this.radius) this.y = canvas.height + this.radius;
-        }
-        draw() {
-          const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-          gradient.addColorStop(0, this.color.replace('0.04', '0.06'));
-          gradient.addColorStop(1, this.color.replace('0.04', '0.00'));
-          ctx.fillStyle = gradient;
-          ctx.fillRect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
-        }
-      }
-
-      for (let i = 0; i < orbCount; i++) {
-        orbs.push(new Orb());
-      }
-
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        orbs.forEach(orb => {
-          orb.update();
-          orb.draw();
-        });
-        requestAnimationFrame(animate);
-      }
-
-      // Don't animate if performance mode is 'low'
-      if (perfMode !== 'low') {
-        animate();
-      }
-
-      window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      });
-    }
-
-    // === SETTINGS MANAGEMENT ===
-    const settingsModal = document.getElementById('settingsModal');
-    const settingsBtn = document.getElementById('settingsBtn');
-    const closeSettingsBtn = document.getElementById('closeSettings');
-    const saveSettingsBtn = document.getElementById('saveSettings');
-    const reloadHubBtn = document.getElementById('reloadHub');
-    const restartNotice = document.getElementById('restartNotice');
-    let inSettings = false;
-
-    function openSettings() {
-      inSettings = true;
-      settingsModal.classList.add('active');
-      loadSettingsValues();
-    }
-
-    function closeSettings() {
-      inSettings = false;
-      settingsModal.classList.remove('active');
-    }
-
-    function loadSettingsValues() {
-      // Populate apps toggles
-      const appsSettings = document.getElementById('appsSettings');
-      appsSettings.innerHTML = '';
-
-      Object.entries(config.apps).forEach(([key, app]) => {
-        const item = document.createElement('div');
-        item.className = 'app-toggle-item';
-        item.innerHTML = `
-          <img src="${app.icon}" alt="${app.name}">
-          <div class="app-toggle-info">${app.name}</div>
-          <div class="setting-control">
-            <input type="checkbox" data-app="${key}" ${app.enabled ? 'checked' : ''} />
-          </div>
-        `;
-        appsSettings.appendChild(item);
-      });
-
-      // Populate display settings
-      document.getElementById('performanceMode').value = config.display.performance_mode;
-      document.getElementById('cursorTimeout').value = config.display.hide_cursor_timeout / 1000;
-
-      // Populate startup settings
-      document.getElementById('checkNetwork').checked = config.startup.check_network;
-
-      // Populate exit settings
-      document.getElementById('exitAction').value = config.exit.action;
-      document.getElementById('showExitConfirm').checked = config.exit.show_confirmation;
-
-      // Populate remote settings
-      document.getElementById('enableCEC').checked = config.remote.enable_cec;
-    }
-
-    function collectSettingsValues() {
-      const newConfig = JSON.parse(JSON.stringify(config));
-
-      // Collect app toggles
-      document.querySelectorAll('[data-app]').forEach(checkbox => {
-        const appKey = checkbox.dataset.app;
-        newConfig.apps[appKey].enabled = checkbox.checked;
-      });
-
-      // Collect display settings
-      newConfig.display.performance_mode = document.getElementById('performanceMode').value;
-      newConfig.display.hide_cursor_timeout = parseInt(document.getElementById('cursorTimeout').value) * 1000;
-
-      // Collect startup settings
-      newConfig.startup.check_network = document.getElementById('checkNetwork').checked;
-
-      // Collect exit settings
-      newConfig.exit.action = document.getElementById('exitAction').value;
-      newConfig.exit.show_confirmation = document.getElementById('showExitConfirm').checked;
-
-      // Collect remote settings
-      newConfig.remote.enable_cec = document.getElementById('enableCEC').checked;
-
-      return newConfig;
-    }
-
-    async function saveSettings(reload = false) {
-      const newConfig = collectSettingsValues();
-
-      try {
-        const response = await fetch('/api/config', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(newConfig)
-        });
-
-        if (response.ok) {
-          config = newConfig;
-
-          if (reload) {
-            // Reload the entire page
-            window.location.reload();
-          } else {
-            restartNotice.classList.add('visible');
-            setTimeout(() => {
-              closeSettings();
-            }, 1000);
-          }
-        } else {
-          alert('Failed to save settings. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error saving settings:', error);
-        alert('Error saving settings: ' + error.message);
-      }
-    }
-
-    settingsBtn.onclick = openSettings;
-    closeSettingsBtn.onclick = closeSettings;
-    saveSettingsBtn.onclick = () => saveSettings(false);
-    reloadHubBtn.onclick = () => saveSettings(true);
-
-    // Settings keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (inSettings && e.key === 'Escape') {
-        closeSettings();
-        e.preventDefault();
-      }
-    });
-
-    // === STARTUP ===
-    async function startup() {
-      await loadConfig();
-      initializeUI();
-      initOrbs();
-
-      if (config.startup.check_network) {
-        await updateNetworkStatus();
-        setInterval(updateNetworkStatus, 5000);
-      }
-    }
-
-    startup();
-  </script>
-</body>
-</html>
+  <script src="settings.js"></script>
+</invoke>

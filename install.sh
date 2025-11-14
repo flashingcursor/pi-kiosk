@@ -78,7 +78,7 @@ install_dependencies() {
     print_header "Installing Dependencies"
 
     PACKAGES=(
-        "chromium-browser"
+        "chromium"
         "python3"
         "python3-pip"
         "cec-utils"

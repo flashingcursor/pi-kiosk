@@ -94,9 +94,9 @@ class MediaHubLauncher:
                 pass
 
             def do_GET(self_handler):
-                # Handle API endpoints
+                # Handle API: Get config
                 if self_handler.path == '/api/config':
-                    self.handle_get_config(self_handler)
+                    self.send_config(self_handler)
                 # Handle launch protocol
                 elif self_handler.path.startswith('/launch'):
                     self.handle_launch_request(self_handler.path)
@@ -108,9 +108,9 @@ class MediaHubLauncher:
                     SimpleHTTPRequestHandler.do_GET(self_handler)
 
             def do_POST(self_handler):
-                # Handle API endpoints
+                # Handle API: Save config
                 if self_handler.path == '/api/config':
-                    self.handle_save_config(self_handler)
+                    self.save_config_api(self_handler)
                 else:
                     self_handler.send_response(404)
                     self_handler.end_headers()
@@ -123,6 +123,50 @@ class MediaHubLauncher:
         except Exception as e:
             logger.error(f"Failed to start HTTP server: {e}")
             sys.exit(1)
+
+    def send_config(self, handler):
+        """Send config to client"""
+        try:
+            # Reload config to get latest
+            self.config = self.load_config()
+
+            handler.send_response(200)
+            handler.send_header('Content-type', 'application/json')
+            handler.send_header('Access-Control-Allow-Origin', '*')
+            handler.end_headers()
+            handler.wfile.write(json.dumps(self.config).encode())
+            logger.info("Config sent to client")
+        except Exception as e:
+            logger.error(f"Failed to send config: {e}")
+            handler.send_response(500)
+            handler.end_headers()
+
+    def save_config_api(self, handler):
+        """Save config from client"""
+        try:
+            content_length = int(handler.headers['Content-Length'])
+            post_data = handler.rfile.read(content_length)
+            new_config = json.loads(post_data.decode())
+
+            # Save to file
+            with open(CONFIG_FILE, 'w') as f:
+                json.dump(new_config, f, indent=2)
+
+            # Reload config
+            self.config = new_config
+
+            handler.send_response(200)
+            handler.send_header('Content-type', 'application/json')
+            handler.send_header('Access-Control-Allow-Origin', '*')
+            handler.end_headers()
+            handler.wfile.write(json.dumps({'success': True}).encode())
+            logger.info("Config saved successfully")
+        except Exception as e:
+            logger.error(f"Failed to save config: {e}")
+            handler.send_response(500)
+            handler.send_header('Content-type', 'application/json')
+            handler.end_headers()
+            handler.wfile.write(json.dumps({'success': False, 'error': str(e)}).encode())
 
     def handle_launch_request(self, path):
         """Handle launch:// protocol requests from browser"""
