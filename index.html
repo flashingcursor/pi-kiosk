@@ -55,6 +55,35 @@
       opacity:1.00;
     }
 
+    /* Settings Button - Top Right */
+    #settingsBtn {
+      position:absolute;
+      top:40px;
+      right:40px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:68px;
+      height:68px;
+      background:rgba(0, 170, 255, 0.2);
+      border:2px solid #00aaff;
+      border-radius:50%;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      opacity:0.4;
+      z-index:3;
+    }
+    #settingsBtn:hover, #settingsBtn:focus {
+      opacity:1;
+      background:rgba(0, 170, 255, 0.4);
+      transform:scale(1.1) rotate(90deg);
+      outline:none;
+    }
+    #settingsBtn svg {
+      width:36px; height:36px; fill:#00aaff;
+      transition:transform 0.3s ease;
+    }
+
     /* Exit Button - Bottom Right */
     #exitBtn {
       position:absolute;
@@ -222,6 +251,212 @@
       z-index: 1;
     }
     #loading.hidden { display: none; }
+
+    /* Settings Modal */
+    #settingsModal {
+      position:absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.95);
+      z-index:100;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 0.4s ease;
+      overflow-y:auto;
+      padding:40px;
+    }
+    #settingsModal.active {
+      opacity:1;
+      pointer-events:all;
+    }
+    #settingsContent {
+      max-width:1200px;
+      margin:0 auto;
+      background:rgba(15,15,25,0.98);
+      border:3px solid #00aaff;
+      border-radius:24px;
+      padding:50px 60px;
+      box-shadow:0 0 60px rgba(0,170,255,0.6);
+      backdrop-filter:blur(12px);
+    }
+    #settingsModal h1 {
+      font-size:3rem;
+      margin-bottom:40px;
+      color:#00aaff;
+      text-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:20px;
+    }
+    #settingsModal h1 svg {
+      width:48px; height:48px; fill:#00aaff;
+    }
+    .settings-section {
+      margin-bottom:40px;
+    }
+    .settings-section h2 {
+      font-size:2rem;
+      margin-bottom:24px;
+      color:#00ff88;
+      border-bottom:2px solid rgba(0,255,136,0.3);
+      padding-bottom:12px;
+    }
+    .setting-item {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:16px 20px;
+      margin-bottom:16px;
+      background:rgba(255,255,255,0.05);
+      border-radius:12px;
+      transition:all 0.3s ease;
+      gap:24px;
+    }
+    .setting-item:hover, .setting-item:focus-within {
+      background:rgba(0,170,255,0.15);
+      transform:translateX(8px);
+    }
+    .setting-label {
+      flex:1;
+      font-size:1.4rem;
+      color:rgba(255,255,255,0.9);
+    }
+    .setting-label small {
+      display:block;
+      font-size:1rem;
+      color:rgba(255,255,255,0.5);
+      margin-top:4px;
+    }
+    .setting-control {
+      min-width:200px;
+    }
+    .setting-control select,
+    .setting-control input[type="number"],
+    .setting-control input[type="text"] {
+      width:100%;
+      padding:12px 16px;
+      font-size:1.3rem;
+      background:rgba(0,0,0,0.5);
+      border:2px solid rgba(0,170,255,0.5);
+      border-radius:8px;
+      color:#fff;
+      cursor:pointer;
+      transition:all 0.3s ease;
+    }
+    .setting-control select:hover,
+    .setting-control select:focus,
+    .setting-control input:hover,
+    .setting-control input:focus {
+      border-color:#00aaff;
+      background:rgba(0,170,255,0.1);
+      outline:none;
+      transform:scale(1.05);
+    }
+    .setting-control input[type="checkbox"] {
+      width:60px;
+      height:32px;
+      position:relative;
+      appearance:none;
+      background:rgba(255,255,255,0.2);
+      border-radius:16px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      outline:none;
+    }
+    .setting-control input[type="checkbox"]:checked {
+      background:#00ff88;
+    }
+    .setting-control input[type="checkbox"]::before {
+      content:'';
+      position:absolute;
+      width:24px;
+      height:24px;
+      background:#fff;
+      border-radius:50%;
+      top:4px;
+      left:4px;
+      transition:all 0.3s ease;
+      box-shadow:0 2px 8px rgba(0,0,0,0.3);
+    }
+    .setting-control input[type="checkbox"]:checked::before {
+      left:32px;
+    }
+    .settings-actions {
+      display:flex;
+      justify-content:center;
+      gap:24px;
+      margin-top:40px;
+      padding-top:32px;
+      border-top:2px solid rgba(255,255,255,0.1);
+    }
+    .settings-btn {
+      padding:16px 48px;
+      font-size:1.6rem;
+      font-weight:600;
+      border-radius:12px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      border:none;
+    }
+    .settings-btn.primary {
+      background:#00ff88;
+      color:#000;
+    }
+    .settings-btn.secondary {
+      background:transparent;
+      color:#00aaff;
+      border:2px solid #00aaff;
+    }
+    .settings-btn.danger {
+      background:transparent;
+      color:#ff6666;
+      border:2px solid #ff6666;
+    }
+    .settings-btn:hover, .settings-btn:focus {
+      transform:scale(1.1);
+      outline:none;
+    }
+    .settings-btn:hover.primary {
+      box-shadow:0 0 20px rgba(0,255,136,0.5);
+    }
+    .app-toggle-item {
+      display:flex;
+      align-items:center;
+      gap:20px;
+      padding:16px 20px;
+      margin-bottom:16px;
+      background:rgba(255,255,255,0.05);
+      border-radius:12px;
+      transition:all 0.3s ease;
+    }
+    .app-toggle-item:hover {
+      background:rgba(0,170,255,0.15);
+    }
+    .app-toggle-item img {
+      width:48px;
+      height:48px;
+      object-fit:contain;
+      border-radius:8px;
+    }
+    .app-toggle-info {
+      flex:1;
+      font-size:1.4rem;
+    }
+    .restart-notice {
+      background:rgba(255,170,0,0.2);
+      border:2px solid #ffaa00;
+      border-radius:12px;
+      padding:16px 24px;
+      margin-top:24px;
+      text-align:center;
+      font-size:1.2rem;
+      color:#ffaa00;
+      display:none;
+    }
+    .restart-notice.visible {
+      display:block;
+    }
   </style>
 </head>
 <body>
@@ -252,10 +487,126 @@
   <!-- Main Menu (populated dynamically) -->
   <div class="container" id="appContainer"></div>
 
+  <!-- Settings Button -->
+  <div id="settingsBtn" tabindex="998">
+    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+  </div>
+
   <!-- Exit Button -->
   <div id="exitBtn" tabindex="999">
     <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
     Exit
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal">
+    <div id="settingsContent">
+      <h1>
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        Settings
+      </h1>
+
+      <div id="settingsForm">
+        <!-- Apps Section -->
+        <div class="settings-section">
+          <h2>Applications</h2>
+          <div id="appsSettings"></div>
+        </div>
+
+        <!-- Display Section -->
+        <div class="settings-section">
+          <h2>Display</h2>
+          <div class="setting-item">
+            <div class="setting-label">
+              Performance Mode
+              <small>Adjust animation quality for your device</small>
+            </div>
+            <div class="setting-control">
+              <select id="performanceMode">
+                <option value="low">Low (Minimal animations)</option>
+                <option value="balanced">Balanced (Recommended)</option>
+                <option value="high">High (Maximum quality)</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label">
+              Hide Cursor Timeout
+              <small>Seconds before cursor disappears (0 to disable)</small>
+            </div>
+            <div class="setting-control">
+              <input type="number" id="cursorTimeout" min="0" max="30" step="1" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Startup Section -->
+        <div class="settings-section">
+          <h2>Startup</h2>
+          <div class="setting-item">
+            <div class="setting-label">
+              Check Network on Startup
+              <small>Verify internet connection before launching</small>
+            </div>
+            <div class="setting-control">
+              <input type="checkbox" id="checkNetwork" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Exit Section -->
+        <div class="settings-section">
+          <h2>Exit Behavior</h2>
+          <div class="setting-item">
+            <div class="setting-label">
+              Exit Action
+              <small>What happens when you exit the launcher</small>
+            </div>
+            <div class="setting-control">
+              <select id="exitAction">
+                <option value="close">Close Application</option>
+                <option value="cec_standby">TV Standby (CEC)</option>
+                <option value="shutdown">Shutdown System</option>
+                <option value="reboot">Reboot System</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label">
+              Show Exit Confirmation
+              <small>Ask before exiting the launcher</small>
+            </div>
+            <div class="setting-control">
+              <input type="checkbox" id="showExitConfirm" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Remote Section -->
+        <div class="settings-section">
+          <h2>Remote Control</h2>
+          <div class="setting-item">
+            <div class="setting-label">
+              Enable CEC Control
+              <small>Control with TV remote via HDMI-CEC</small>
+            </div>
+            <div class="setting-control">
+              <input type="checkbox" id="enableCEC" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="restart-notice" id="restartNotice">
+        Some changes require a restart to take effect
+      </div>
+
+      <div class="settings-actions">
+        <button class="settings-btn primary" id="saveSettings">Save Changes</button>
+        <button class="settings-btn secondary" id="reloadHub">Save & Reload</button>
+        <button class="settings-btn danger" id="closeSettings">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -397,14 +748,17 @@
       items.forEach(i => i.classList.remove('selected'));
       overlays.forEach(o => o.classList.remove('active'));
       exitBtn.classList.remove('selected');
+      settingsBtn.classList.remove('selected');
 
       if (index < items.length) {
         items[index].classList.add('selected');
         const app = apps[index];
         const overlay = document.querySelector(`.overlay.${app.key}`);
         if (overlay) overlay.classList.add('active');
-      } else {
+      } else if (index === items.length) {
         exitBtn.classList.add('selected');
+      } else {
+        settingsBtn.classList.add('selected');
       }
     }
 
@@ -412,8 +766,10 @@
       const items = document.querySelectorAll('.item');
       if (index < items.length) {
         items[index].focus();
-      } else {
+      } else if (index === items.length) {
         exitBtn.focus();
+      } else {
+        settingsBtn.focus();
       }
     }
 
@@ -487,6 +843,13 @@
         return;
       }
 
+      // Settings shortcut (S key or Menu key)
+      if (!inSettings && !inConfirm && (e.key === 's' || e.key === 'S' || e.key === 'ContextMenu')) {
+        openSettings();
+        e.preventDefault();
+        return;
+      }
+
       if (inConfirm) {
         if (e.key === 'Escape' || e.key === 'Backspace') {
           hideConfirm();
@@ -514,11 +877,17 @@
         return;
       }
 
+      if (inSettings) {
+        // Settings modal handles its own Escape key
+        return;
+      }
+
       const totalItems = apps.length;
       const isInExit = currentSelection === totalItems;
+      const isInSettings = currentSelection === totalItems + 1;
 
       if (e.key === 'ArrowDown') {
-        if (isInExit) {
+        if (isInSettings || isInExit) {
           currentSelection = 0;
         } else {
           currentSelection = (currentSelection + 1) % totalItems;
@@ -527,7 +896,9 @@
         focusItem(currentSelection);
         e.preventDefault();
       } else if (e.key === 'ArrowUp') {
-        if (isInExit) {
+        if (isInSettings) {
+          currentSelection = totalItems; // Go to exit
+        } else if (isInExit) {
           currentSelection = totalItems - 1;
         } else {
           currentSelection = (currentSelection - 1 + totalItems) % totalItems;
@@ -535,20 +906,30 @@
         updateSelection(currentSelection);
         focusItem(currentSelection);
         e.preventDefault();
-      } else if (e.key === 'ArrowRight' && !isInExit) {
-        currentSelection = totalItems;
-        updateSelection(currentSelection);
-        focusItem(currentSelection);
+      } else if (e.key === 'ArrowRight') {
+        if (!isInExit && !isInSettings) {
+          currentSelection = totalItems;
+          updateSelection(currentSelection);
+          focusItem(currentSelection);
+        }
         e.preventDefault();
-      } else if (e.key === 'ArrowLeft' && isInExit) {
-        currentSelection = totalItems - 1;
-        updateSelection(currentSelection);
-        focusItem(currentSelection);
+      } else if (e.key === 'ArrowLeft') {
+        if (isInExit) {
+          currentSelection = totalItems - 1;
+          updateSelection(currentSelection);
+          focusItem(currentSelection);
+        } else if (isInSettings) {
+          currentSelection = totalItems;
+          updateSelection(currentSelection);
+          focusItem(currentSelection);
+        }
         e.preventDefault();
       } else if (e.key === 'Enter') {
         if (currentSelection < totalItems) {
           const app = apps[currentSelection];
           showConfirm(app.key);
+        } else if (isInSettings) {
+          openSettings();
         } else {
           handleExit();
         }
@@ -558,7 +939,7 @@
 
     // Mouse hover
     document.addEventListener('mouseover', (e) => {
-      if (inConfirm) return;
+      if (inConfirm || inSettings) return;
 
       const item = e.target.closest('.item');
       if (item) {
@@ -570,6 +951,9 @@
         }
       } else if (e.target.closest('#exitBtn')) {
         currentSelection = apps.length;
+        updateSelection(currentSelection);
+      } else if (e.target.closest('#settingsBtn')) {
+        currentSelection = apps.length + 1;
         updateSelection(currentSelection);
       }
     });
@@ -644,6 +1028,131 @@
         canvas.height = window.innerHeight;
       });
     }
+
+    // === SETTINGS MANAGEMENT ===
+    const settingsModal = document.getElementById('settingsModal');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const closeSettingsBtn = document.getElementById('closeSettings');
+    const saveSettingsBtn = document.getElementById('saveSettings');
+    const reloadHubBtn = document.getElementById('reloadHub');
+    const restartNotice = document.getElementById('restartNotice');
+    let inSettings = false;
+
+    function openSettings() {
+      inSettings = true;
+      settingsModal.classList.add('active');
+      loadSettingsValues();
+    }
+
+    function closeSettings() {
+      inSettings = false;
+      settingsModal.classList.remove('active');
+    }
+
+    function loadSettingsValues() {
+      // Populate apps toggles
+      const appsSettings = document.getElementById('appsSettings');
+      appsSettings.innerHTML = '';
+
+      Object.entries(config.apps).forEach(([key, app]) => {
+        const item = document.createElement('div');
+        item.className = 'app-toggle-item';
+        item.innerHTML = `
+          <img src="${app.icon}" alt="${app.name}">
+          <div class="app-toggle-info">${app.name}</div>
+          <div class="setting-control">
+            <input type="checkbox" data-app="${key}" ${app.enabled ? 'checked' : ''} />
+          </div>
+        `;
+        appsSettings.appendChild(item);
+      });
+
+      // Populate display settings
+      document.getElementById('performanceMode').value = config.display.performance_mode;
+      document.getElementById('cursorTimeout').value = config.display.hide_cursor_timeout / 1000;
+
+      // Populate startup settings
+      document.getElementById('checkNetwork').checked = config.startup.check_network;
+
+      // Populate exit settings
+      document.getElementById('exitAction').value = config.exit.action;
+      document.getElementById('showExitConfirm').checked = config.exit.show_confirmation;
+
+      // Populate remote settings
+      document.getElementById('enableCEC').checked = config.remote.enable_cec;
+    }
+
+    function collectSettingsValues() {
+      const newConfig = JSON.parse(JSON.stringify(config));
+
+      // Collect app toggles
+      document.querySelectorAll('[data-app]').forEach(checkbox => {
+        const appKey = checkbox.dataset.app;
+        newConfig.apps[appKey].enabled = checkbox.checked;
+      });
+
+      // Collect display settings
+      newConfig.display.performance_mode = document.getElementById('performanceMode').value;
+      newConfig.display.hide_cursor_timeout = parseInt(document.getElementById('cursorTimeout').value) * 1000;
+
+      // Collect startup settings
+      newConfig.startup.check_network = document.getElementById('checkNetwork').checked;
+
+      // Collect exit settings
+      newConfig.exit.action = document.getElementById('exitAction').value;
+      newConfig.exit.show_confirmation = document.getElementById('showExitConfirm').checked;
+
+      // Collect remote settings
+      newConfig.remote.enable_cec = document.getElementById('enableCEC').checked;
+
+      return newConfig;
+    }
+
+    async function saveSettings(reload = false) {
+      const newConfig = collectSettingsValues();
+
+      try {
+        const response = await fetch('/api/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newConfig)
+        });
+
+        if (response.ok) {
+          config = newConfig;
+
+          if (reload) {
+            // Reload the entire page
+            window.location.reload();
+          } else {
+            restartNotice.classList.add('visible');
+            setTimeout(() => {
+              closeSettings();
+            }, 1000);
+          }
+        } else {
+          alert('Failed to save settings. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error saving settings:', error);
+        alert('Error saving settings: ' + error.message);
+      }
+    }
+
+    settingsBtn.onclick = openSettings;
+    closeSettingsBtn.onclick = closeSettings;
+    saveSettingsBtn.onclick = () => saveSettings(false);
+    reloadHubBtn.onclick = () => saveSettings(true);
+
+    // Settings keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (inSettings && e.key === 'Escape') {
+        closeSettings();
+        e.preventDefault();
+      }
+    });
 
     // === STARTUP ===
     async function startup() {
