@@ -59,7 +59,7 @@ The interface features:
 Install Pi Media Hub with a single command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/flashingcursor/pi-kiosk/main/bootstrap.sh | bash
+curl -sSL https://raw.githubusercontent.com/flashingcursor/pi-kiosk/master/bootstrap.sh | bash
 ```
 
 This will:

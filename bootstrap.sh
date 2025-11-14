@@ -2,7 +2,7 @@
 # Pi Media Hub Bootstrap Installer
 # One-command installer for Raspberry Pi
 #
-# Usage: curl -sSL https://raw.githubusercontent.com/flashingcursor/pi-kiosk/main/bootstrap.sh | bash
+# Usage: curl -sSL https://raw.githubusercontent.com/flashingcursor/pi-kiosk/master/bootstrap.sh | bash
 
 set -e
 
@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 # Configuration
 REPO_URL="https://github.com/flashingcursor/pi-kiosk.git"
 INSTALL_DIR="$HOME/pi-media-hub"
-BRANCH="main"
+BRANCH="master"
 
 # Print functions
 print_header() {
