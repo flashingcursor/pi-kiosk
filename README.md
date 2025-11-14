@@ -396,7 +396,7 @@ python3 launcher.py
 
 Check Chromium installation:
 ```bash
-chromium-browser --version
+chromium --version
 ```
 
 Try launching manually:
@@ -441,7 +441,7 @@ cat config.json | grep -A 5 "apps"
 
 Test browser manually:
 ```bash
-chromium-browser --kiosk https://www.youtube.com/tv
+chromium --kiosk https://www.youtube.com/tv
 ```
 
 ### CEC not working

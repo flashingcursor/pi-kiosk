@@ -45,7 +45,7 @@ if ! command -v python3 &> /dev/null; then
 fi
 
 if ! command -v chromium-browser &> /dev/null && ! command -v chromium &> /dev/null; then
-    MISSING_DEPS+=("chromium-browser")
+    MISSING_DEPS+=("chromium")
 fi
 
 # Install missing dependencies
