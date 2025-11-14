@@ -305,31 +305,58 @@ class MediaHubLauncher:
         if not self.browser_process:
             return
 
-        def read_output():
+        def read_stderr():
             try:
                 # Read stderr (where most errors go)
                 if self.browser_process.stderr:
                     for line in iter(self.browser_process.stderr.readline, b''):
                         if line:
                             decoded = line.decode('utf-8', errors='replace').strip()
-                            # Only log significant errors, not all Chromium noise
-                            if any(keyword in decoded.lower() for keyword in ['error', 'fatal', 'failed', 'cannot', 'refused']):
-                                logger.error(f"Browser stderr: {decoded}")
+                            # Log ALL output during startup/crash debugging
+                            if decoded:
+                                logger.info(f"Browser stderr: {decoded}")
             except Exception as e:
-                logger.debug(f"Error reading browser output: {e}")
+                logger.debug(f"Error reading browser stderr: {e}")
 
-        output_thread = Thread(target=read_output, daemon=True)
-        output_thread.start()
+        def read_stdout():
+            try:
+                # Read stdout as well
+                if self.browser_process.stdout:
+                    for line in iter(self.browser_process.stdout.readline, b''):
+                        if line:
+                            decoded = line.decode('utf-8', errors='replace').strip()
+                            # Log ALL output during startup/crash debugging
+                            if decoded:
+                                logger.info(f"Browser stdout: {decoded}")
+            except Exception as e:
+                logger.debug(f"Error reading browser stdout: {e}")
+
+        stderr_thread = Thread(target=read_stderr, daemon=True)
+        stdout_thread = Thread(target=read_stdout, daemon=True)
+        stderr_thread.start()
+        stdout_thread.start()
 
     def launch_browser(self):
         """Launch Chromium browser in kiosk mode"""
         chromium = self.find_chromium()
         if not chromium:
             logger.error("Chromium not found!")
+            logger.error("Please install chromium: sudo apt-get install chromium")
+            sys.exit(1)
+
+        # Verify chromium is executable
+        if not os.access(chromium, os.X_OK):
+            logger.error(f"Chromium binary at {chromium} is not executable!")
             sys.exit(1)
 
         url = f'http://127.0.0.1:{self.port}/index.html'
-        flags = self.config['advanced']['chromium_flags']
+        flags = self.config['advanced']['chromium_flags'].copy()
+
+        # Add --no-sandbox if running as root (common in containers/kiosks)
+        if os.geteuid() == 0:
+            if '--no-sandbox' not in flags:
+                logger.warning("Running as root, adding --no-sandbox flag")
+                flags.append('--no-sandbox')
 
         cmd = [chromium] + flags + [url]
 
@@ -339,7 +366,10 @@ class MediaHubLauncher:
             # Set display
             env = os.environ.copy()
             if 'DISPLAY' not in env:
+                logger.warning("DISPLAY not set, defaulting to :0")
                 env['DISPLAY'] = ':0'
+            else:
+                logger.info(f"Using DISPLAY={env['DISPLAY']}")
 
             self.browser_process = subprocess.Popen(
                 cmd,
@@ -353,19 +383,16 @@ class MediaHubLauncher:
             self.monitor_browser_output()
 
             # Check if browser crashes immediately
-            time.sleep(0.5)
+            time.sleep(1.0)  # Give browser more time to initialize
             poll_result = self.browser_process.poll()
             if poll_result is not None:
-                # Process has already exited
-                stderr_output = self.browser_process.stderr.read().decode('utf-8', errors='replace') if self.browser_process.stderr else ''
-                stdout_output = self.browser_process.stdout.read().decode('utf-8', errors='replace') if self.browser_process.stdout else ''
-
+                # Process has already exited (stderr is being logged by monitor thread)
                 logger.error(f"Browser process exited immediately with code {poll_result}")
-                if stderr_output:
-                    logger.error(f"Browser stderr:\n{stderr_output}")
-                if stdout_output:
-                    logger.info(f"Browser stdout:\n{stdout_output}")
-
+                logger.error("Check the stderr output above for error details")
+                logger.error(f"Chromium path: {chromium}")
+                logger.error(f"Command: {' '.join(cmd)}")
+                # Give monitor thread time to finish logging
+                time.sleep(0.5)
                 sys.exit(1)
 
         except Exception as e:
