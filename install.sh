@@ -154,6 +154,7 @@ setup_scripts() {
 
     chmod +x "$INSTALL_DIR/launcher.py"
     chmod +x "$INSTALL_DIR/setup.py"
+    chmod +x "$INSTALL_DIR/uninstall.sh"
     chmod +x "$INSTALL_DIR/scripts/cec-control.sh"
     chmod +x "$INSTALL_DIR/scripts/check-network.sh"
 

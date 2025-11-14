@@ -409,6 +409,20 @@ Check logs:
 journalctl -u pi-media-hub -n 50
 ```
 
+### Installation fails or is incomplete
+
+If installation failed partway through, re-run the bootstrap installer:
+```bash
+curl -sSL https://raw.githubusercontent.com/flashingcursor/pi-kiosk/master/bootstrap.sh | bash
+```
+
+The installer will detect the incomplete installation and offer to:
+1. Update existing installation
+2. Remove and reinstall from scratch
+3. Cancel
+
+Choose option 2 to clean up and start fresh. Your configuration will be preserved.
+
 ### Screen blanks/sleeps
 
 Verify `.xsession` file:
@@ -498,13 +512,12 @@ A: We use youtube.com/tv which is the TV-optimized interface.
 A: Yes, though it's optimized for Pi. Just run `./install.sh`.
 
 **Q: How do I uninstall?**
-A:
+A: Run the uninstall script:
 ```bash
-sudo systemctl stop pi-media-hub
-sudo systemctl disable pi-media-hub
-sudo rm /etc/systemd/system/pi-media-hub.service
-sudo systemctl daemon-reload
+cd ~/pi-media-hub
+./uninstall.sh
 ```
+The script will guide you through removing the service, files, and optionally packages.
 
 ## License
 

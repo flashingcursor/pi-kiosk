@@ -87,32 +87,118 @@ fi
 
 # Check for existing installation
 if [ -d "$INSTALL_DIR" ]; then
-    print_warning "Pi Media Hub is already installed at $INSTALL_DIR"
-    echo ""
-    read -p "Do you want to update it? (y/N) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        print_info "Backing up existing configuration..."
-        if [ -f "$INSTALL_DIR/config.json" ]; then
-            cp "$INSTALL_DIR/config.json" "$INSTALL_DIR/config.json.backup"
-            print_success "Config backed up to config.json.backup"
+    # Check if it's a valid git repository
+    if [ -d "$INSTALL_DIR/.git" ] && [ -f "$INSTALL_DIR/launcher.py" ]; then
+        print_warning "Pi Media Hub is already installed at $INSTALL_DIR"
+        echo ""
+        echo "Options:"
+        echo "  1) Update existing installation"
+        echo "  2) Remove and reinstall from scratch"
+        echo "  3) Cancel"
+        echo ""
+        read -p "Choose an option (1/2/3): " -n 1 -r
+        echo
+
+        if [[ $REPLY == "1" ]]; then
+            print_info "Backing up existing configuration..."
+            if [ -f "$INSTALL_DIR/config.json" ]; then
+                cp "$INSTALL_DIR/config.json" "$INSTALL_DIR/config.json.backup"
+                print_success "Config backed up to config.json.backup"
+            fi
+
+            print_info "Updating repository..."
+            cd "$INSTALL_DIR"
+            git pull origin $BRANCH
+            print_success "Repository updated"
+
+            print_info "Restoring configuration..."
+            if [ -f "$INSTALL_DIR/config.json.backup" ]; then
+                mv "$INSTALL_DIR/config.json.backup" "$INSTALL_DIR/config.json"
+                print_success "Configuration restored"
+            fi
+
+            UPDATE_MODE=true
+        elif [[ $REPLY == "2" ]]; then
+            print_warning "Removing incomplete/existing installation..."
+
+            # Backup config if it exists
+            if [ -f "$INSTALL_DIR/config.json" ]; then
+                BACKUP_CONFIG=$(mktemp)
+                cp "$INSTALL_DIR/config.json" "$BACKUP_CONFIG"
+                print_info "Config backed up to $BACKUP_CONFIG"
+            fi
+
+            rm -rf "$INSTALL_DIR"
+            print_success "Removed existing directory"
+
+            # Clone fresh copy
+            print_header "Downloading Pi Media Hub"
+            print_info "Cloning from $REPO_URL..."
+
+            git clone --depth 1 --branch $BRANCH "$REPO_URL" "$INSTALL_DIR"
+
+            if [ $? -eq 0 ]; then
+                print_success "Repository cloned successfully"
+
+                # Restore config if we backed it up
+                if [ -n "$BACKUP_CONFIG" ] && [ -f "$BACKUP_CONFIG" ]; then
+                    cp "$BACKUP_CONFIG" "$INSTALL_DIR/config.json"
+                    print_success "Restored previous configuration"
+                    rm "$BACKUP_CONFIG"
+                fi
+            else
+                print_error "Failed to clone repository"
+                exit 1
+            fi
+
+            UPDATE_MODE=false
+        else
+            print_info "Installation cancelled"
+            exit 0
         fi
-
-        print_info "Updating repository..."
-        cd "$INSTALL_DIR"
-        git pull origin $BRANCH
-        print_success "Repository updated"
-
-        print_info "Restoring configuration..."
-        if [ -f "$INSTALL_DIR/config.json.backup" ]; then
-            mv "$INSTALL_DIR/config.json.backup" "$INSTALL_DIR/config.json"
-            print_success "Configuration restored"
-        fi
-
-        UPDATE_MODE=true
     else
-        print_info "Installation cancelled"
-        exit 0
+        # Directory exists but incomplete installation
+        print_warning "Found incomplete installation at $INSTALL_DIR"
+        echo ""
+        read -p "Remove and reinstall? (Y/n) " -n 1 -r
+        echo
+
+        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+            # Backup config if it exists
+            if [ -f "$INSTALL_DIR/config.json" ]; then
+                BACKUP_CONFIG=$(mktemp)
+                cp "$INSTALL_DIR/config.json" "$BACKUP_CONFIG"
+                print_info "Config backed up to $BACKUP_CONFIG"
+            fi
+
+            rm -rf "$INSTALL_DIR"
+            print_success "Removed incomplete installation"
+
+            # Clone fresh copy
+            print_header "Downloading Pi Media Hub"
+            print_info "Cloning from $REPO_URL..."
+
+            git clone --depth 1 --branch $BRANCH "$REPO_URL" "$INSTALL_DIR"
+
+            if [ $? -eq 0 ]; then
+                print_success "Repository cloned successfully"
+
+                # Restore config if we backed it up
+                if [ -n "$BACKUP_CONFIG" ] && [ -f "$BACKUP_CONFIG" ]; then
+                    cp "$BACKUP_CONFIG" "$INSTALL_DIR/config.json"
+                    print_success "Restored previous configuration"
+                    rm "$BACKUP_CONFIG"
+                fi
+            else
+                print_error "Failed to clone repository"
+                exit 1
+            fi
+
+            UPDATE_MODE=false
+        else
+            print_info "Installation cancelled"
+            exit 0
+        fi
     fi
 else
     # Clone repository
@@ -138,6 +224,7 @@ cd "$INSTALL_DIR"
 chmod +x install.sh
 chmod +x launcher.py
 chmod +x setup.py
+chmod +x uninstall.sh
 chmod +x scripts/*.sh 2>/dev/null || true
 
 # Run the main installer
