@@ -4,6 +4,13 @@
 
 set -e
 
+# Detect if stdin is a terminal (interactive) or a pipe (non-interactive)
+if [ -t 0 ]; then
+    INTERACTIVE=true
+else
+    INTERACTIVE=false
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALL_DIR="$SCRIPT_DIR"
 USERNAME="${SUDO_USER:-$USER}"
@@ -58,10 +65,14 @@ check_platform() {
         return 0
     else
         print_warning "This doesn't appear to be a Raspberry Pi"
-        read -p "Continue anyway? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
+        if [ "$INTERACTIVE" = true ]; then
+            read -p "Continue anyway? (y/N) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                exit 1
+            fi
+        else
+            print_info "Non-interactive mode: continuing anyway"
         fi
     fi
 }
@@ -94,17 +105,21 @@ install_dependencies() {
 
     # Optional: Jellyfin Media Player
     print_info "\nOptional: Jellyfin Media Player (native app)"
-    read -p "Install Jellyfin Media Player? (y/N) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        if command -v flatpak &> /dev/null || sudo apt install -y flatpak; then
-            print_info "Installing Jellyfin Media Player via Flatpak..."
-            flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
-            flatpak install -y flathub com.github.iwalton3.jellyfin-media-player || true
-            print_success "Jellyfin Media Player installed"
-        else
-            print_warning "Flatpak installation failed, skipping Jellyfin Media Player"
+    if [ "$INTERACTIVE" = true ]; then
+        read -p "Install Jellyfin Media Player? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            if command -v flatpak &> /dev/null || sudo apt install -y flatpak; then
+                print_info "Installing Jellyfin Media Player via Flatpak..."
+                flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
+                flatpak install -y flathub com.github.iwalton3.jellyfin-media-player || true
+                print_success "Jellyfin Media Player installed"
+            else
+                print_warning "Flatpak installation failed, skipping Jellyfin Media Player"
+            fi
         fi
+    else
+        print_info "Non-interactive mode: skipping optional Jellyfin Media Player installation"
     fi
 }
 
@@ -185,12 +200,17 @@ enable_service() {
     sudo systemctl enable $SERVICE_FILE
     print_success "Service enabled - will start on boot"
 
-    read -p "Start service now? (y/N) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        sudo systemctl start $SERVICE_FILE
-        print_success "Service started"
-        print_info "Check status: sudo systemctl status $SERVICE_FILE"
+    if [ "$INTERACTIVE" = true ]; then
+        read -p "Start service now? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            sudo systemctl start $SERVICE_FILE
+            print_success "Service started"
+            print_info "Check status: sudo systemctl status $SERVICE_FILE"
+        fi
+    else
+        print_info "Non-interactive mode: service will start on next boot"
+        print_info "To start now: sudo systemctl start $SERVICE_FILE"
     fi
 }
 
@@ -214,22 +234,33 @@ create_config() {
 
     if [ -f "$INSTALL_DIR/config.json" ]; then
         print_info "config.json already exists"
-        read -p "Run setup wizard to reconfigure? (y/N) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            python3 "$INSTALL_DIR/setup.py"
+        if [ "$INTERACTIVE" = true ]; then
+            read -p "Run setup wizard to reconfigure? (y/N) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                python3 "$INSTALL_DIR/setup.py"
+            fi
+        else
+            print_info "Non-interactive mode: keeping existing configuration"
         fi
     else
         print_info "No config.json found"
-        read -p "Run setup wizard now? (Y/n) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-            python3 "$INSTALL_DIR/setup.py"
+        if [ "$INTERACTIVE" = true ]; then
+            read -p "Run setup wizard now? (Y/n) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+                python3 "$INSTALL_DIR/setup.py"
+            else
+                # Copy default config
+                cp "$INSTALL_DIR/config.default.json" "$INSTALL_DIR/config.json"
+                print_info "Using default configuration"
+                print_warning "Run 'python3 setup.py' to customize settings"
+            fi
         else
-            # Copy default config
+            # Copy default config in non-interactive mode
             cp "$INSTALL_DIR/config.default.json" "$INSTALL_DIR/config.json"
-            print_info "Using default configuration"
-            print_warning "Run './setup.py' to customize settings"
+            print_info "Non-interactive mode: using default configuration"
+            print_warning "Run 'python3 setup.py' to customize settings"
         fi
     fi
 }
