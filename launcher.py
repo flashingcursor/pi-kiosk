@@ -300,6 +300,27 @@ class MediaHubLauncher:
                 return path
         return None
 
+    def monitor_browser_output(self):
+        """Monitor browser output in background thread"""
+        if not self.browser_process:
+            return
+
+        def read_output():
+            try:
+                # Read stderr (where most errors go)
+                if self.browser_process.stderr:
+                    for line in iter(self.browser_process.stderr.readline, b''):
+                        if line:
+                            decoded = line.decode('utf-8', errors='replace').strip()
+                            # Only log significant errors, not all Chromium noise
+                            if any(keyword in decoded.lower() for keyword in ['error', 'fatal', 'failed', 'cannot', 'refused']):
+                                logger.error(f"Browser stderr: {decoded}")
+            except Exception as e:
+                logger.debug(f"Error reading browser output: {e}")
+
+        output_thread = Thread(target=read_output, daemon=True)
+        output_thread.start()
+
     def launch_browser(self):
         """Launch Chromium browser in kiosk mode"""
         chromium = self.find_chromium()
@@ -327,6 +348,26 @@ class MediaHubLauncher:
                 stderr=subprocess.PIPE
             )
             logger.info(f"Browser process started (PID: {self.browser_process.pid})")
+
+            # Start monitoring output
+            self.monitor_browser_output()
+
+            # Check if browser crashes immediately
+            time.sleep(0.5)
+            poll_result = self.browser_process.poll()
+            if poll_result is not None:
+                # Process has already exited
+                stderr_output = self.browser_process.stderr.read().decode('utf-8', errors='replace') if self.browser_process.stderr else ''
+                stdout_output = self.browser_process.stdout.read().decode('utf-8', errors='replace') if self.browser_process.stdout else ''
+
+                logger.error(f"Browser process exited immediately with code {poll_result}")
+                if stderr_output:
+                    logger.error(f"Browser stderr:\n{stderr_output}")
+                if stdout_output:
+                    logger.info(f"Browser stdout:\n{stdout_output}")
+
+                sys.exit(1)
+
         except Exception as e:
             logger.error(f"Failed to launch browser: {e}")
             sys.exit(1)
