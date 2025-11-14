@@ -89,40 +89,73 @@ class MediaHubLauncher:
         """Start local HTTP server for the interface"""
         os.chdir(SCRIPT_DIR)
 
+        # Store reference to parent launcher for use in handler
+        launcher = self
+
         class CustomHandler(SimpleHTTPRequestHandler):
             def log_message(self, format, *args):
-                # Suppress default logging
-                pass
+                # Log to our logger instead of suppressing
+                logger.info(f"HTTP: {format % args}")
 
-            def do_GET(self_handler):
-                # Handle API: Get config
-                if self_handler.path == '/api/config':
-                    self.send_config(self_handler)
-                # Handle launch protocol
-                elif self_handler.path.startswith('/launch'):
-                    self.handle_launch_request(self_handler.path)
-                    self_handler.send_response(200)
-                    self_handler.send_header('Content-type', 'text/html')
-                    self_handler.end_headers()
-                    self_handler.wfile.write(b'<html><body>Launching...</body></html>')
-                else:
-                    SimpleHTTPRequestHandler.do_GET(self_handler)
+            def log_error(self, format, *args):
+                # Log errors
+                logger.error(f"HTTP Error: {format % args}")
 
-            def do_POST(self_handler):
-                # Handle API: Save config
-                if self_handler.path == '/api/config':
-                    self.save_config_api(self_handler)
-                else:
-                    self_handler.send_response(404)
-                    self_handler.end_headers()
+            def do_GET(self):
+                try:
+                    # Handle API: Get config
+                    if self.path == '/api/config':
+                        launcher.send_config(self)
+                    # Handle launch protocol
+                    elif self.path.startswith('/launch'):
+                        launcher.handle_launch_request(self.path)
+                        self.send_response(200)
+                        self.send_header('Content-type', 'text/html')
+                        self.end_headers()
+                        self.wfile.write(b'<html><body>Launching...</body></html>')
+                    else:
+                        SimpleHTTPRequestHandler.do_GET(self)
+                except Exception as e:
+                    logger.error(f"Error in do_GET: {e}", exc_info=True)
+                    try:
+                        self.send_response(500)
+                        self.end_headers()
+                    except:
+                        pass
+
+            def do_POST(self):
+                try:
+                    # Handle API: Save config
+                    if self.path == '/api/config':
+                        launcher.save_config_api(self)
+                    else:
+                        self.send_response(404)
+                        self.end_headers()
+                except Exception as e:
+                    logger.error(f"Error in do_POST: {e}", exc_info=True)
+                    try:
+                        self.send_response(500)
+                        self.end_headers()
+                    except:
+                        pass
 
         try:
-            self.http_server = HTTPServer(('localhost', self.port), CustomHandler)
-            self.http_thread = Thread(target=self.http_server.serve_forever, daemon=True)
+            # Bind to 127.0.0.1 explicitly instead of 'localhost' to avoid IPv6 issues
+            self.http_server = HTTPServer(('127.0.0.1', self.port), CustomHandler)
+            logger.info(f"HTTP server created, binding to 127.0.0.1:{self.port}")
+
+            def server_thread_wrapper():
+                try:
+                    logger.info("HTTP server thread starting...")
+                    self.http_server.serve_forever()
+                except Exception as e:
+                    logger.error(f"HTTP server thread crashed: {e}", exc_info=True)
+
+            self.http_thread = Thread(target=server_thread_wrapper, daemon=True)
             self.http_thread.start()
-            logger.info(f"HTTP server started on port {self.port}")
+            logger.info(f"HTTP server thread started")
         except Exception as e:
-            logger.error(f"Failed to start HTTP server: {e}")
+            logger.error(f"Failed to start HTTP server: {e}", exc_info=True)
             sys.exit(1)
 
     def wait_for_server_ready(self, timeout=10):
@@ -133,20 +166,25 @@ class MediaHubLauncher:
                 # Try to connect to the server
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.settimeout(1)
-                result = sock.connect_ex(('localhost', self.port))
+                result = sock.connect_ex(('127.0.0.1', self.port))
                 sock.close()
 
                 if result == 0:
-                    logger.info(f"HTTP server is ready and accepting connections")
+                    logger.info(f"HTTP server is ready and accepting connections on 127.0.0.1:{self.port}")
                     return True
 
-                logger.debug(f"Server not ready yet, waiting... (attempt {int(time.time() - start_time)}s/{timeout}s)")
+                logger.info(f"Server not ready yet, waiting... ({int(time.time() - start_time)}s/{timeout}s)")
                 time.sleep(0.5)
             except Exception as e:
-                logger.debug(f"Error checking server readiness: {e}")
+                logger.warning(f"Error checking server readiness: {e}")
                 time.sleep(0.5)
 
         logger.error(f"Server failed to become ready within {timeout} seconds")
+        # Check if thread is still alive
+        if self.http_thread and self.http_thread.is_alive():
+            logger.error("HTTP thread is running but not accepting connections")
+        else:
+            logger.error("HTTP thread has died")
         return False
 
     def send_config(self, handler):
@@ -269,7 +307,7 @@ class MediaHubLauncher:
             logger.error("Chromium not found!")
             sys.exit(1)
 
-        url = f'http://localhost:{self.port}/index.html'
+        url = f'http://127.0.0.1:{self.port}/index.html'
         flags = self.config['advanced']['chromium_flags']
 
         cmd = [chromium] + flags + [url]
@@ -285,10 +323,10 @@ class MediaHubLauncher:
             self.browser_process = subprocess.Popen(
                 cmd,
                 env=env,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
             )
-            logger.info("Browser launched successfully")
+            logger.info(f"Browser process started (PID: {self.browser_process.pid})")
         except Exception as e:
             logger.error(f"Failed to launch browser: {e}")
             sys.exit(1)
