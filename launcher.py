@@ -12,6 +12,7 @@ import signal
 import logging
 import time
 import shutil
+import socket
 from pathlib import Path
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from threading import Thread
@@ -123,6 +124,30 @@ class MediaHubLauncher:
         except Exception as e:
             logger.error(f"Failed to start HTTP server: {e}")
             sys.exit(1)
+
+    def wait_for_server_ready(self, timeout=10):
+        """Wait for HTTP server to be ready to accept connections"""
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                # Try to connect to the server
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(1)
+                result = sock.connect_ex(('localhost', self.port))
+                sock.close()
+
+                if result == 0:
+                    logger.info(f"HTTP server is ready and accepting connections")
+                    return True
+
+                logger.debug(f"Server not ready yet, waiting... (attempt {int(time.time() - start_time)}s/{timeout}s)")
+                time.sleep(0.5)
+            except Exception as e:
+                logger.debug(f"Error checking server readiness: {e}")
+                time.sleep(0.5)
+
+        logger.error(f"Server failed to become ready within {timeout} seconds")
+        return False
 
     def send_config(self, handler):
         """Send config to client"""
@@ -475,8 +500,10 @@ class MediaHubLauncher:
         # Start HTTP server
         self.start_http_server()
 
-        # Wait a moment for server to be ready
-        time.sleep(1)
+        # Wait for server to be ready
+        if not self.wait_for_server_ready(timeout=10):
+            logger.error("HTTP server failed to start properly")
+            sys.exit(1)
 
         # Launch browser
         self.launch_browser()
