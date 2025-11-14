@@ -6,6 +6,13 @@
 
 set -e
 
+# Detect if stdin is a terminal (interactive) or a pipe (non-interactive)
+if [ -t 0 ]; then
+    INTERACTIVE=true
+else
+    INTERACTIVE=false
+fi
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -75,10 +82,14 @@ if [ -f /proc/device-tree/model ]; then
         print_success "Running on Raspberry Pi"
     else
         print_warning "This doesn't appear to be a Raspberry Pi"
-        read -p "Continue anyway? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
+        if [ "$INTERACTIVE" = true ]; then
+            read -p "Continue anyway? (y/N) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                exit 1
+            fi
+        else
+            print_info "Non-interactive mode: continuing anyway"
         fi
     fi
 else
@@ -90,14 +101,20 @@ if [ -d "$INSTALL_DIR" ]; then
     # Check if it's a valid git repository
     if [ -d "$INSTALL_DIR/.git" ] && [ -f "$INSTALL_DIR/launcher.py" ]; then
         print_warning "Pi Media Hub is already installed at $INSTALL_DIR"
-        echo ""
-        echo "Options:"
-        echo "  1) Update existing installation"
-        echo "  2) Remove and reinstall from scratch"
-        echo "  3) Cancel"
-        echo ""
-        read -p "Choose an option (1/2/3): " -n 1 -r
-        echo
+
+        if [ "$INTERACTIVE" = true ]; then
+            echo ""
+            echo "Options:"
+            echo "  1) Update existing installation"
+            echo "  2) Remove and reinstall from scratch"
+            echo "  3) Cancel"
+            echo ""
+            read -p "Choose an option (1/2/3): " -n 1 -r
+            echo
+        else
+            print_info "Non-interactive mode: updating existing installation"
+            REPLY="1"
+        fi
 
         if [[ $REPLY == "1" ]]; then
             print_info "Backing up existing configuration..."
@@ -159,9 +176,15 @@ if [ -d "$INSTALL_DIR" ]; then
     else
         # Directory exists but incomplete installation
         print_warning "Found incomplete installation at $INSTALL_DIR"
-        echo ""
-        read -p "Remove and reinstall? (Y/n) " -n 1 -r
-        echo
+
+        if [ "$INTERACTIVE" = true ]; then
+            echo ""
+            read -p "Remove and reinstall? (Y/n) " -n 1 -r
+            echo
+        else
+            print_info "Non-interactive mode: removing and reinstalling"
+            REPLY="Y"
+        fi
 
         if [[ ! $REPLY =~ ^[Nn]$ ]]; then
             # Backup config if it exists
@@ -235,11 +258,17 @@ print_info "This will install all required dependencies\n"
 sleep 2
 
 # Ask about auto-start
-read -p "Do you want the media hub to start automatically on boot? (y/N) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    AUTO_START="--enable-service"
+if [ "$INTERACTIVE" = true ]; then
+    read -p "Do you want the media hub to start automatically on boot? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        AUTO_START="--enable-service"
+    else
+        AUTO_START=""
+    fi
 else
+    print_info "Non-interactive mode: skipping auto-start configuration"
+    print_info "You can enable it later with: sudo systemctl enable pi-media-hub"
     AUTO_START=""
 fi
 
