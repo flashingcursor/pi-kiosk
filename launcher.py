@@ -94,8 +94,11 @@ class MediaHubLauncher:
                 pass
 
             def do_GET(self_handler):
+                # Handle API endpoints
+                if self_handler.path == '/api/config':
+                    self.handle_get_config(self_handler)
                 # Handle launch protocol
-                if self_handler.path.startswith('/launch'):
+                elif self_handler.path.startswith('/launch'):
                     self.handle_launch_request(self_handler.path)
                     self_handler.send_response(200)
                     self_handler.send_header('Content-type', 'text/html')
@@ -103,6 +106,14 @@ class MediaHubLauncher:
                     self_handler.wfile.write(b'<html><body>Launching...</body></html>')
                 else:
                     SimpleHTTPRequestHandler.do_GET(self_handler)
+
+            def do_POST(self_handler):
+                # Handle API endpoints
+                if self_handler.path == '/api/config':
+                    self.handle_save_config(self_handler)
+                else:
+                    self_handler.send_response(404)
+                    self_handler.end_headers()
 
         try:
             self.http_server = HTTPServer(('localhost', self.port), CustomHandler)
@@ -122,6 +133,57 @@ class MediaHubLauncher:
         elif '/launch/app/' in path:
             app_key = path.split('/launch/app/')[-1].split('?')[0]
             self.launch_app(app_key)
+
+    def handle_get_config(self, handler):
+        """Handle GET /api/config - Return current configuration"""
+        try:
+            handler.send_response(200)
+            handler.send_header('Content-Type', 'application/json')
+            handler.send_header('Access-Control-Allow-Origin', '*')
+            handler.end_headers()
+
+            config_json = json.dumps(self.config, indent=2)
+            handler.wfile.write(config_json.encode())
+            logger.info("Config sent to client")
+        except Exception as e:
+            logger.error(f"Error sending config: {e}")
+            handler.send_response(500)
+            handler.end_headers()
+
+    def handle_save_config(self, handler):
+        """Handle POST /api/config - Save new configuration"""
+        try:
+            content_length = int(handler.headers['Content-Length'])
+            post_data = handler.rfile.read(content_length)
+            new_config = json.loads(post_data.decode())
+
+            # Validate config structure
+            required_keys = ['apps', 'display', 'startup', 'exit', 'remote', 'advanced']
+            if not all(key in new_config for key in required_keys):
+                handler.send_response(400)
+                handler.end_headers()
+                handler.wfile.write(b'Invalid config structure')
+                return
+
+            # Save to config.json
+            with open(CONFIG_FILE, 'w') as f:
+                json.dump(new_config, f, indent=2)
+
+            # Update in-memory config
+            self.config = new_config
+
+            handler.send_response(200)
+            handler.send_header('Content-Type', 'application/json')
+            handler.send_header('Access-Control-Allow-Origin', '*')
+            handler.end_headers()
+            handler.wfile.write(b'{"status": "success"}')
+
+            logger.info("Config saved successfully")
+        except Exception as e:
+            logger.error(f"Error saving config: {e}")
+            handler.send_response(500)
+            handler.end_headers()
+            handler.wfile.write(f'{{"error": "{str(e)}"}}'.encode())
 
     def find_chromium(self):
         """Find chromium binary"""
